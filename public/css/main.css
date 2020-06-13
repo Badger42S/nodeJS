@@ -1,0 +1,13 @@
+header {
+    background-color: aqua;
+}
+ul {
+    border: 2px solid brown ;
+    text-align: center;
+    padding: 10px;
+}
+main {
+    padding: 1rem;
+    display: inline-block;
+    border: 3px dashed rgb(220, 230, 81);
+}

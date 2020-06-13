@@ -1,18 +1,23 @@
 const http =require('http');
 
 const express=require('express');
-const { response } = require('express');
-
+const bodyParser=require('body-parser');
+const path =require('path');
+//create server
 const app=express();
 
-app.use((request, response, next)=>{
-    console.log('middleware');
-    next();
-});
-app.use((request, response, next)=>{
-    response.send('Tada');
+const adminRoute=require('./routes/admin');
+const shopRoute=require('./routes/shop');
+
+//useing middlewware
+app.use(bodyParser.urlencoded({extended:false}));
+//static files
+app.use(express.static(path.join(__dirname,'public')));
+
+app.use('/admin',adminRoute);
+app.use(shopRoute);
+app.use((req,resp)=>{
+    resp.status(404).sendFile(path.join(__dirname,'views','404.html'));
 });
 
-const server=http.createServer(app );
-
-server.listen(3000);
+app.listen(3000);
