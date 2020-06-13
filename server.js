@@ -1,7 +1,18 @@
 const http =require('http');
 
-function listener(req, resp){
+const express=require('express');
+const { response } = require('express');
 
-};
+const app=express();
 
-http.createServer(listener);
+app.use((request, response, next)=>{
+    console.log('middleware');
+    next();
+});
+app.use((request, response, next)=>{
+    response.send('Tada');
+});
+
+const server=http.createServer(app );
+
+server.listen(3000);
