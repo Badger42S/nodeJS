@@ -10,21 +10,17 @@ app.set('view engine', 'ejs');
 //share place of templates
 app.set('views', 'views');
 
-const adminData=require('./routes/admin');
+const adminRouter=require('./routes/admin');
 const shopRoute=require('./routes/shop');
+const errorController=require('./controllers/error');
 
 //useing middlewware
 app.use(bodyParser.urlencoded({extended:false}));
 //static files
 app.use(express.static(path.join(__dirname,'public')));
 
-app.use('/admin',adminData.routes);
+app.use('/admin',adminRouter);
 app.use(shopRoute);
-app.use((req,resp)=>{
-    resp.status(404).render('404',{
-        pageTitle : "Page not found",
-        path: '/404'
-    });
-});
+app.use(errorController.get404);
 
 app.listen(3000);
