@@ -7,7 +7,15 @@ exports.getProductAdd=(request, response, next)=>{
     })};
 
 exports.postProductAdd=(request, response, next)=>{
-       const prod=new Product(request.body.title);
+       const title=request.body.title;
+       const imgUrl=request.body.imgUrl;
+       const description=request.body.description;
+       const price=request.body.price;
+       const prod=new Product(
+           title,
+           imgUrl,
+           description,
+           price);
        prod.save();
        response.redirect('/');
 };

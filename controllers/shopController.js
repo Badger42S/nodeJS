@@ -28,6 +28,14 @@ exports.getCart=(request, response, next)=>{
     })
 };
 
+exports.getOrders=(request, response, next)=>{
+    response.render('shop/orders',{
+        //prods: products,
+        pageTitle: 'Orders',
+        path: '/orders',
+    })
+};
+
 exports.getCheckout=(request, response, next)=>{
     response.render('shop/checkout',{
         prods: products,
