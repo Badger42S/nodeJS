@@ -19,8 +19,9 @@ exports.postProductAdd=(request, response, next)=>{
            imgUrl,
            description,
            price);
-       prod.save();
-       response.redirect('/');
+       prod.save()
+        .then(()=>response.redirect('/'))
+        .catch();
 };
 
 exports.getProductEdit=(request, response, next)=>{

@@ -2,34 +2,40 @@ const Product=require('../models/productModel');
 const Cart =require('../models/cartModel');
 
 exports.getProducts =(request, response, next)=>{
-    Product.fetchAll((products)=>{
-        response.render('shop/product-list',{
-            prods: products,
-            pageTitle: 'All products',
-            path: '/products',
+    Product.fetchAll()
+        .then(([rows, fieldData])=>{
+            response.render('shop/product-list',{
+                prods: rows,
+                pageTitle: 'All products',
+                path: '/products',
+            })
         })
-    });
+        .catch();
 };
 
 exports.getProduct =(request, response, next)=>{
     const productId=request.params.productId;
-    Product.findById(productId, (product)=>{
-        response.render('shop/product-detail',
-        {product: product,
-        pageTitle: 'Detail',
-        path: '/products',
-        });
-    });
+    Product.findById(productId)
+        .then(([row, filedData])=>{
+            response.render('shop/product-detail',
+            {product: row[0],
+            pageTitle: 'Detail',
+            path: '/products',
+            });
+        })
+        .catch();
 };
 
 exports.getIndex=(request, response, next)=>{
-    Product.fetchAll((products)=>{
-        response.render('shop/index',{
-            prods: products,
-            pageTitle: 'Shop',
-            path: '/',
+    Product.fetchAll()
+        .then(([rows, fieldData])=>{
+            response.render('shop/index',{
+                prods: rows,
+                pageTitle: 'Shop',
+                path: '/',
+            });
         })
-    });
+        .catch();
 };
 
 exports.getCart=(request, response, next)=>{
