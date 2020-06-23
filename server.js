@@ -12,18 +12,46 @@ const adminRouter=require('./routes/admin');
 const shopRoute=require('./routes/shop');
 const errorController=require('./controllers/error');
 const sequelize=require('./util/database');
+const Product =require('./models/productModel');
+const User =require('./models/userModel');
 
 //useing middlewware
 app.use(bodyParser.urlencoded({extended:false}));
 //static files
 app.use(express.static(path.join(__dirname,'public')));
 
+app.use((req,resp, next)=>{
+    User.findByPk(1)
+        .then(user=>{
+            req.user=user;
+            next();
+        })
+        .catch();
+});
+
 app.use('/admin',adminRouter);
 app.use(shopRoute);
 app.use(errorController.get404);
-//create table
-sequelize.sync()
-    .then()
-    .catch(err=>{console.log(err)});
 
-app.listen(3000);
+//relationship one-to-many
+Product.belongsTo(User,{constrains:true, onDelete:'CASCADE'});
+User.hasMany(Product);
+
+//create tables
+sequelize.sync()
+    .then(result=>{
+       return User.findByPk(1)})
+    .then(user=>{
+        if(!user){
+            return User.create({
+                name:'Silmaryl',
+                email:'fff@kkk'
+            })
+        }
+        return user;
+    })
+    .then(user=>{
+        //console.log(user);
+        app.listen(3000)
+    })
+    .catch(err=>{console.log(err)});

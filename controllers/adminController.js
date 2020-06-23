@@ -13,12 +13,12 @@ exports.postProductAdd=(request, response, next)=>{
        const imgUrl=request.body.imgUrl;
        const description=request.body.description;
        const price=request.body.price;
-       Product.create({
-           title:title,
-           imgUrl:imgUrl,
-           price:price,
-           description:description
-       })
+       request.user.createProduct({
+            title:title,
+            imgUrl:imgUrl,
+            price:price,
+            description:description
+        })
         .then(()=>response.redirect('/'))
         .catch();
 };
@@ -57,7 +57,8 @@ exports.postProductEdit=(request, response, next)=>{
 };
 
 exports.getProduct=(request, response, next)=>{
-    Product.findAll()
+    request.user.getProducts()
+    //Product.findAll()
     .then(products=>{
         response.render('admin/products',{
             prods: products,
