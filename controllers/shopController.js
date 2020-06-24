@@ -1,7 +1,7 @@
 const Product=require('../models/productModel');
 
 exports.getProducts =(request, response, next)=>{
-    Product.findAll()
+    Product.fetchAll()
     .then(products=>{
         response.render('shop/product-list',{
             prods: products,
@@ -14,7 +14,7 @@ exports.getProducts =(request, response, next)=>{
 
 exports.getProduct =(request, response, next)=>{
     const productId=request.params.productId;
-    Product.findByPk(productId)
+    Product.findById(productId)
         .then(product=>{
             response.render('shop/product-detail',
             {product: product,
@@ -26,7 +26,7 @@ exports.getProduct =(request, response, next)=>{
 };
 
 exports.getIndex=(request, response, next)=>{
-    Product.findAll()
+    Product.fetchAll()
     .then(products=>{
         response.render('shop/index',{
             prods: products,

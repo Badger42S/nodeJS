@@ -13,20 +13,18 @@ exports.postProductAdd=(request, response, next)=>{
        const imgUrl=request.body.imgUrl;
        const description=request.body.description;
        const price=request.body.price;
-       request.user.createProduct({
-            title:title,
-            imgUrl:imgUrl,
-            price:price,
-            description:description
-        })
-        .then(()=>response.redirect('/'))
-        .catch();
+       const product =new Product(title, price, description, imgUrl);
+        product.save()
+            .then((result)=>{
+                console.log(result);
+                response.redirect('/')})
+            .catch();
 };
 
 exports.getProductEdit=(request, response, next)=>{
     const editMode=request.query.edit;
     const productId=request.params.productId;
-    Product.findByPk(productId)
+    Product.findById(productId)
         .then(product=>{
             response.render('admin/edit-product',{
                 pageTitle : "Edit Product",
@@ -44,21 +42,19 @@ exports.postProductEdit=(request, response, next)=>{
     const updatedImgUrl=request.body.imgUrl;
     const updatedDescription=request.body.description;
     const updatedPrice=request.body.price;
-    Product.findByPk(prodId)
-        .then(product=>{
-            product.title=updatedTitle;
-            product.imgUrl=updatedImgUrl;
-            product.description=updatedDescription;
-            product.price=updatedPrice;
-            return product.save();
-        })
+    const product =new Product(
+        updatedTitle, 
+        updatedPrice, 
+        updatedDescription, 
+        updatedImgUrl, 
+        prodId);
+    product.save()
         .then(()=>response.redirect('/admin/products'))
         .catch();
 };
 
 exports.getProduct=(request, response, next)=>{
-    request.user.getProducts()
-    //Product.findAll()
+    Product.fetchAll()
     .then(products=>{
         response.render('admin/products',{
             prods: products,
