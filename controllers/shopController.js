@@ -1,5 +1,4 @@
 const Product=require('../models/productModel');
-const Cart =require('../models/cartModel');
 
 exports.getProducts =(request, response, next)=>{
     Product.findAll()
@@ -39,38 +38,61 @@ exports.getIndex=(request, response, next)=>{
 };
 
 exports.getCart=(request, response, next)=>{
-    Cart.getCart(cart=>{
-        Product.fetchAll(products=>{
-            const cartProducts=[];
-            for (product of products){
-                const cartProductData=cart.products.find(prod=> prod.id===product.id);
-                if(cartProductData){
-                    cartProducts.push({prodData: product, qty: cartProductData.qty});
-                }
-            }
+    request.user
+        .getCart()
+        .then(cart=>{
+            return cart.getProducts()
+        })
+        .then(products=>{
             response.render('shop/cart',{
-                cartProducts: cartProducts,
+                cartProducts: products,
                 pageTitle: 'Cart',
                 path: '/cart',
             });
-        });
-    });
+        })
+        .catch(err=>console.log(err))
 };
 
 exports.postCart=(request, response, next)=>{
     const prodId=request.body.productId;
-    Product.findById(prodId, (product)=>{
-        Cart.addProduct(prodId, product.price);
-    });
-    response.redirect('/cart');
+    let fetchCart;
+    let newQty=1;
+    request.user
+        .getCart()
+        .then(cart=>{
+            fetchCart=cart;
+            return cart.getProducts({where: {id: prodId}});
+        })
+        .then(products=>{
+            let product;
+            if(products.length>0){
+                product=products[0];
+            }
+            if(product){
+                const oldQty=product.cartItem.qty;
+                newQty =oldQty+1;
+                return product;
+            }
+            return Product.findByPk(prodId)
+        })
+        .then(product=>{
+            return fetchCart.addProduct(product, {
+                through: {qty:newQty}})
+        })
+        .then(()=>response.redirect('/cart'))
+        .catch(err=>console.log(err));
 };
 
 exports.getOrders=(request, response, next)=>{
-    response.render('shop/orders',{
-        //prods: products,
-        pageTitle: 'Orders',
-        path: '/orders',
-    })
+    request.user.getOrders({include:['products']})
+        .then(orders=>{
+            response.render('shop/orders',{
+                orders: orders,
+                pageTitle: 'Orders',
+                path: '/orders',
+            })
+        })
+        .catch(err=>console.log(err));
 };
 
 exports.getCheckout=(request, response, next)=>{
@@ -83,8 +105,40 @@ exports.getCheckout=(request, response, next)=>{
 
 exports.postCartDeleteProd=(request, response, next)=>{
     const prodId=request.body.productId;
-    Product.findById(prodId, product=>{
-        Cart.deleteProduct(prodId, product.price);
-        response.redirect('/cart');
-    });
+    request.user.getCart()
+        .then(cart=>{
+            return cart.getProducts({where: {id: prodId}})
+        })
+        .then(products=>{
+            const product =products[0];
+            return product.cartItem.destroy()
+        })
+        .then(result=>response.redirect('/cart'))
+        .catch(err=>console.log(err));
+};
+
+exports.postOrder=(request, response, next)=>{
+    let fetchCart;
+    request.user.getCart()
+        .then(cart=>{
+            fetchCart=cart;
+            return cart.getProducts()
+        })
+        .then(products=>{
+            return request.user.createOrder()
+                    .then(order=>{
+                        order.addProducts(products.map(prod=>{
+                            prod.orderItem ={qty: prod.cartItem.qty};
+                            return prod;
+                        }))
+                    })
+                    .catch(err=>console.log(err));
+        })
+        .then(result=>{
+            return fetchCart.setProducts(null);
+        })
+        .then(result=>{
+            response.redirect('/orders')
+        })
+        .catch(err=>console.log(err));
 };

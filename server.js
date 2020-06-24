@@ -11,9 +11,14 @@ app.set('views', 'views');
 const adminRouter=require('./routes/admin');
 const shopRoute=require('./routes/shop');
 const errorController=require('./controllers/error');
+//SQL db links
 const sequelize=require('./util/database');
 const Product =require('./models/productModel');
 const User =require('./models/userModel');
+const Cart =require('./models/cartModel');
+const CartItem=require('./models/cartItemModel');
+const Order = require('./models/orderModel');
+const OrderItem = require('./models/orderItemsModel');
 
 //useing middlewware
 app.use(bodyParser.urlencoded({extended:false}));
@@ -33,9 +38,18 @@ app.use('/admin',adminRouter);
 app.use(shopRoute);
 app.use(errorController.get404);
 
-//relationship one-to-many
+//relationships
 Product.belongsTo(User,{constrains:true, onDelete:'CASCADE'});
 User.hasMany(Product);
+//----
+User.hasOne(Cart);
+Cart.belongsTo(User);
+Cart.belongsToMany(Product, {through: CartItem});
+Product.belongsToMany(Cart, {through: CartItem});
+//----
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product, {through: OrderItem});
 
 //create tables
 sequelize.sync()
@@ -49,6 +63,9 @@ sequelize.sync()
             })
         }
         return user;
+    })
+    .then(user=>{
+        return user.getCart();
     })
     .then(user=>{
         //console.log(user);
