@@ -14,10 +14,21 @@ const shopRoute=require('./routes/shop');
 const errorController=require('./controllers/error');
 const mongoConnect=require('./util/database').mongoConnect;
 
+const User=require('./models/userModel');
+
 //useing middlewware
 app.use(bodyParser.urlencoded({extended:false}));
 //static files
 app.use(express.static(path.join(__dirname,'public')));
+
+app.use((req,res,next)=>{
+    User.findById("5ef557fcb90b7026dcfdd50a")
+        .then(user=>{
+            req.user=new User(user.name, user.email, user.cart, user._id);
+            next();
+        })
+        .catch(err=>console.log(err));
+})
 
 app.use('/admin',adminRouter);
 app.use(shopRoute);

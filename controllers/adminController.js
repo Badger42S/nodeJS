@@ -13,7 +13,7 @@ exports.postProductAdd=(request, response, next)=>{
        const imgUrl=request.body.imgUrl;
        const description=request.body.description;
        const price=request.body.price;
-       const product =new Product(title, price, description, imgUrl);
+       const product =new Product(title, price, description, imgUrl, null, request.user._id);
         product.save()
             .then((result)=>{
                 console.log(result);
@@ -67,10 +67,7 @@ exports.getProduct=(request, response, next)=>{
 
 exports.postProductDelete=(request, response, next)=>{
     const prodId=request.body.productId;   
-    Product.findByPk(prodId)
-        .then(product=>{
-            return product.destroy();
-        })
+    Product.deleteById(prodId)
         .then(()=>response.redirect('/admin/products'))
-        .catch();
+        .catch(err=>console.log(err));
 };
