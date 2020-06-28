@@ -11,9 +11,9 @@
                     <li>
                         <p><%=order._id%></p> 
                         <ul>
-                            <% order.items.forEach(item=>{%>
+                            <% order.products.forEach(item=>{%>
                                 <li>
-                                    <%=item.title%> (<%=item.qty%>)
+                                    <%=item.productData.title%> (<%=item.qty%>)
                                 </li>
                             <%})%>
                         </ul>

@@ -1,4 +1,5 @@
 const Product=require('../models/productModel');
+const Orders=require('../models/orderModel');
 
 exports.getProducts =(request, response, next)=>{
     Product
@@ -41,8 +42,10 @@ exports.getIndex=(request, response, next)=>{
 
 exports.getCart=(request, response, next)=>{
     request.user
-        .getCart()
-        .then(products=>{
+        .populate('cart.items.productId')
+        .execPopulate()
+        .then(user=>{
+            const products=user.cart.items;
             response.render('shop/cart',{
                 cartProducts: products,
                 pageTitle: 'Cart',
@@ -63,7 +66,8 @@ exports.postCart=(request, response, next)=>{
 };
 
 exports.getOrder=(request, response, next)=>{
-    request.user.getOrder()
+    Orders
+        .find({'user.userId':request.user._id})
         .then(orders=>{
             response.render('shop/orders',{
                 orders: orders,
@@ -90,7 +94,25 @@ exports.postCartDeleteProd=(request, response, next)=>{
 };
 
 exports.postOrder=(request, response, next)=>{
-    request.user.addOrder()
+    request.user
+        .populate('cart.items.productId')
+        .execPopulate()
+        .then(user=>{
+            const products=user.cart.items.map(itm=>{
+                return {qty:itm.qty, productData: {...itm.productId._doc}};
+            });
+            const order=new Orders({
+                user:{
+                    name:request.user.name,
+                    userId:request.user._id
+                },
+                products:products
+            });
+            return order.save();
+        })
+        .then(()=>{
+            return request.user.clearCart()
+        })
         .then(result=>{
             response.redirect('/orders')
         })

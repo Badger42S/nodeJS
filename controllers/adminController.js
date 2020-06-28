@@ -17,7 +17,8 @@ exports.postProductAdd=(request, response, next)=>{
            title:title,
            price:price,
            description:description,
-           imgUrl:imgUrl
+           imgUrl:imgUrl,
+           userId: request.user._id
         });
         product
             .save()
