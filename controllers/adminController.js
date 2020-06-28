@@ -13,12 +13,18 @@ exports.postProductAdd=(request, response, next)=>{
        const imgUrl=request.body.imgUrl;
        const description=request.body.description;
        const price=request.body.price;
-       const product =new Product(title, price, description, imgUrl, null, request.user._id);
-        product.save()
+       const product =new Product({
+           title:title,
+           price:price,
+           description:description,
+           imgUrl:imgUrl
+        });
+        product
+            .save()
             .then((result)=>{
                 console.log(result);
                 response.redirect('/')})
-            .catch();
+            .catch(err=>console.log(err));
 };
 
 exports.getProductEdit=(request, response, next)=>{
@@ -33,7 +39,7 @@ exports.getProductEdit=(request, response, next)=>{
                 product:product
             });
         })
-        .catch();
+        .catch(err=>console.log(err));
 }
 
 exports.postProductEdit=(request, response, next)=>{
@@ -42,19 +48,21 @@ exports.postProductEdit=(request, response, next)=>{
     const updatedImgUrl=request.body.imgUrl;
     const updatedDescription=request.body.description;
     const updatedPrice=request.body.price;
-    const product =new Product(
-        updatedTitle, 
-        updatedPrice, 
-        updatedDescription, 
-        updatedImgUrl, 
-        prodId);
-    product.save()
+    Product.findById(prodId)
+        .then(product=>{
+            product.title=updatedTitle;
+            product.price=updatedPrice;
+            product.description=updatedDescription;
+            product.imgUrl=updatedImgUrl;
+            return product.save();
+        })
         .then(()=>response.redirect('/admin/products'))
-        .catch();
+        .catch(err=>console.log(err));
 };
 
-exports.getProduct=(request, response, next)=>{
-    Product.fetchAll()
+exports.getProducts=(request, response, next)=>{
+    Product
+    .find()
     .then(products=>{
         response.render('admin/products',{
             prods: products,
@@ -62,12 +70,12 @@ exports.getProduct=(request, response, next)=>{
             path: '/admin/products',
         })
     })
-    .catch();
+    .catch(err=>console.log(err));
 };
 
 exports.postProductDelete=(request, response, next)=>{
     const prodId=request.body.productId;   
-    Product.deleteById(prodId)
+    Product.findByIdAndRemove(prodId)
         .then(()=>response.redirect('/admin/products'))
         .catch(err=>console.log(err));
 };

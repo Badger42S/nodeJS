@@ -1,7 +1,5 @@
 const Sequelize =require('sequelize');
 
-const sequelize =require('../util/database');
-const OrderModel = require('./orderModel');
 
 const OrderItemModel = sequelize.define('orderItem', {
     id: {

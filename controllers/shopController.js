@@ -1,7 +1,8 @@
 const Product=require('../models/productModel');
 
 exports.getProducts =(request, response, next)=>{
-    Product.fetchAll()
+    Product
+    .find()
     .then(products=>{
         response.render('shop/product-list',{
             prods: products,
@@ -9,24 +10,25 @@ exports.getProducts =(request, response, next)=>{
             path: '/products',
         });
     })
-    .catch();
+    .catch(err=>console.log(err));
 };
 
 exports.getProduct =(request, response, next)=>{
-    const productId=request.params.productId;
-    Product.findById(productId)
+    const prodId=request.params.productId;
+    Product.findById(prodId)
         .then(product=>{
-            response.render('shop/product-detail',
-            {product: product,
+            response.render('shop/product-detail', {
+            product: product,
             pageTitle: 'Detail',
             path: '/products',
             });
         })
-        .catch();
+        .catch(err=>console.log(err));
 };
 
 exports.getIndex=(request, response, next)=>{
-    Product.fetchAll()
+    Product
+    .find()
     .then(products=>{
         response.render('shop/index',{
             prods: products,
@@ -34,7 +36,7 @@ exports.getIndex=(request, response, next)=>{
             path: '/',
         });
     })
-    .catch();
+    .catch(err=>console.log(err));
 };
 
 exports.getCart=(request, response, next)=>{

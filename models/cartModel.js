@@ -1,6 +1,4 @@
-const Sequelize =require('sequelize');
 
-const sequelize =require('../util/database');
 
 const CartModel = sequelize.define('cart', {
     id:{
