@@ -1,19 +1,20 @@
 const express=require('express');
 
 const adminController=require('../controllers/adminController');
+const checkAuth=require('../middleweare/check-auth');
 
 const router =express.Router();
 
-router.get('/add-product',adminController.getProductAdd);
+router.get('/add-product', checkAuth, adminController.getProductAdd);
 
-router.get('/products', adminController.getProducts);
+router.get('/products', checkAuth, adminController.getProducts);
 
-router.get('/edit-product/:productId',adminController.getProductEdit);
+router.get('/edit-product/:productId', checkAuth,adminController.getProductEdit);
 
-router.post('/add-product',adminController.postProductAdd);
+router.post('/add-product', checkAuth,adminController.postProductAdd);
 
-router.post('/edit-product',adminController.postProductEdit);
+router.post('/edit-product', checkAuth,adminController.postProductEdit);
 
-router.post('/delete-product', adminController.postProductDelete);
+router.post('/delete-product', checkAuth, adminController.postProductDelete);
 
 module.exports = router;

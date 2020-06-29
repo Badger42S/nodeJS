@@ -39,7 +39,10 @@ app.use(session({
 }));
 
 app.use((req,res,next)=>{
-    User.findById("5ef89ecca7f9fa2ed8261176")
+    if(!req.session.user){
+        return next();
+    }
+    User.findById(req.session.user._id)
         .then(user=>{
             req.user=user;
             next();
@@ -52,15 +55,8 @@ app.use(shopRoute);
 app.use(authRoute);
 app.use(errorController.get404);
 
-mongoose.connect(MONGO_URI)
+mongoose
+    .connect(MONGO_URI)
     .then(()=>{
-        // const user=new User({
-        //     name:'Totoro',
-        //     email:'forest@pole.com',
-        //     cart:{
-        //         items:[]
-        //     }
-        // });
-        // user.save();
         app.listen(3000);
     });
