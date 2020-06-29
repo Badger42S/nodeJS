@@ -13,11 +13,23 @@
             <li class="main-header__item">
                 <a class="<%= path==='/orders' ? 'active' : ''%>" href="/orders">Orders</a>
             </li>
+            <% if(true) {%>
+                <li class="main-header__item">
+                    <a class="<%= path==='/admin/add-product' ? 'active' : ''%>" href="/admin/add-product">Add product</a>
+                </li>
+                <li class="main-header__item">
+                    <a class="<%= path==='/admin/products' ? 'active' : ''%>" href="/admin/products">Admin products</a>
+                </li>
+            <%}%>
+        </ul>
+        <ul class="main-header__item-list">
             <li class="main-header__item">
-                <a class="<%= path==='/admin/add-product' ? 'active' : ''%>" href="/admin/add-product">Add product</a>
+                <a href="/login" class="<%= path==='/login' ? 'active' : ''%>">Login</a>
             </li>
             <li class="main-header__item">
-                <a class="<%= path==='/admin/products' ? 'active' : ''%>" href="/admin/products">Admin products</a>
+                <form action="/logout" method="post">
+                    <button type="submit" class="btn">LogOut</button>
+                </form>
             </li>
         </ul>
     </nav>

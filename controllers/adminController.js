@@ -4,7 +4,7 @@ exports.getProductAdd=(request, response, next)=>{
     response.render('admin/edit-product',{
         pageTitle : "Add Product",
         path: '/admin/add-product',
-        editing:false
+        editing:false,
     })
 };
 
@@ -37,7 +37,7 @@ exports.getProductEdit=(request, response, next)=>{
                 pageTitle : "Edit Product",
                 path: '/admin/edit-product',
                 editing:editMode,
-                product:product
+                product:product,
             });
         })
         .catch(err=>console.log(err));
