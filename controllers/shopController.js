@@ -9,7 +9,6 @@ exports.getProducts =(request, response, next)=>{
             prods: products,
             pageTitle: 'All products',
             path: '/products',
-            isAuthenticated: request.session.isLoggedIn
         });
     })
     .catch(err=>console.log(err));
@@ -23,7 +22,6 @@ exports.getProduct =(request, response, next)=>{
             product: product,
             pageTitle: 'Detail',
             path: '/products',
-            isAuthenticated: request.session.isLoggedIn
             });
         })
         .catch(err=>console.log(err));
@@ -37,7 +35,6 @@ exports.getIndex=(request, response, next)=>{
             prods: products,
             pageTitle: 'Shop',
             path: '/',
-            isAuthenticated: request.session.isLoggedIn
         });
     })
     .catch(err=>console.log(err));
@@ -53,7 +50,6 @@ exports.getCart=(request, response, next)=>{
                 cartProducts: products,
                 pageTitle: 'Cart',
                 path: '/cart',
-                isAuthenticated: request.session.isLoggedIn
             });
         })
         .catch(err=>console.log(err))
@@ -77,7 +73,6 @@ exports.getOrder=(request, response, next)=>{
                 orders: orders,
                 pageTitle: 'Orders',
                 path: '/orders',
-                isAuthenticated: request.session.isLoggedIn
             })
         })
         .catch(err=>console.log(err));
@@ -88,7 +83,6 @@ exports.getCheckout=(request, response, next)=>{
         prods: products,
         pageTitle: 'Checkout',
         path: '/checkout',
-        isAuthenticated: request.session.isLoggedIn
     })
 };
 
@@ -109,7 +103,7 @@ exports.postOrder=(request, response, next)=>{
             });
             const order=new Orders({
                 user:{
-                    name:request.user.name,
+                    name:request.user.email,
                     userId:request.user._id
                 },
                 products:products

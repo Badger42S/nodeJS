@@ -3,6 +3,7 @@ const bodyParser=require('body-parser');
 const mongoose =require('mongoose');
 const session=require('express-session');
 const MongoSession=require('connect-mongodb-session')(session);
+const csrf = require('csurf');
 
 const path =require('path');
 const User=require('./models/userModel');
@@ -15,6 +16,8 @@ const sessionStore =new MongoSession({
     uri:MONGO_URI,
     collection:'session',
 });
+//protection token
+const protectToken=csrf();
 //set template engine
 app.set('view engine', 'ejs');
 //share place of templates
@@ -38,6 +41,8 @@ app.use(session({
     store: sessionStore
 }));
 
+app.use(protectToken);
+
 app.use((req,res,next)=>{
     if(!req.session.user){
         return next();
@@ -49,6 +54,12 @@ app.use((req,res,next)=>{
         })
         .catch(err=>console.log(err));
 })
+
+app.use((req,res,next)=>{
+    res.locals.isAuthenticated= req.session.isLoggedIn;
+    res.locals.csrfToken=req.csrfToken();
+    next();
+});
 
 app.use('/admin',adminRouter);
 app.use(shopRoute);
