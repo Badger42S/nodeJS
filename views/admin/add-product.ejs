@@ -25,7 +25,7 @@
                 <label for="description">Description</label>
                 <textarea name="description" id="description" cols="30" rows="5">description</textarea>
             </div>
-
+            <input type="hidden" name="_csrf" value="<%=csrfToken%>">
             <button class="btn" type="submit">Add Product</button>
         </form>
     </main>

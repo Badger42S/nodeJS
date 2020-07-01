@@ -1,6 +1,7 @@
 const crypt =require('bcryptjs');
-
+const crypto=require('crypto');
 const userModel = require("../models/userModel");
+const { mongo } = require('mongoose');
 
 exports.getLogin=(request, response, next)=>{
     let errorMessage=request.flash('error');
@@ -81,4 +82,89 @@ exports.postLogin=(request, response, next)=>{
                 });
         })
         .catch(err=>console.log(err));
+};
+
+exports.getResetPassword=(request, response, next)=>{
+    let errorMessage=request.flash('error');
+    if(errorMessage.length>0){
+        errorMessage= errorMessage[0];
+    } else {
+        errorMessage=null;
+    }
+    response.render('auth/password-reset',{
+        pageTitle: 'Reset Password',
+        path: '/reset',
+        errorMessage: errorMessage
+    })
+};
+
+exports.postResetPassword=(request, response, next)=>{
+    crypto.randomBytes(32, (err, buff)=>{
+        if(err){
+            console.log(err);
+            return response.redirect('/reset');
+        }
+        const token=buff.toString('hex');
+        userModel.findOne({email:request.body.email})
+            .then(user=>{
+                if(!user){
+                    request.flash('error', 'No accaunt');
+                    return response.redirect('/reset');
+                }
+                user.resetToken=token;
+                user.resetTokenExperation= Date.now()+3600;
+                return user.save();
+            })
+            .then(res=>{
+                response.render('auth/reset-page',{
+                    pageTitle: 'Reset page',
+                    path: '/reset',
+                    resetToken:token
+                })
+            })
+            .catch(err=>console.log(err));
+    })
+};
+
+exports.getNewPassword=(request, response, next)=>{
+    const token=request.params.token;
+    userModel.findOne({
+        resetToken:token, 
+        resetTokenExperation:{$gt:Date.now()}
+    })
+    .then(user=>{
+        response.render('auth/new-password',{
+            pageTitle: 'New password',
+            path: '/new-password',
+            userId:user._id,
+            token:token
+        })
+    })
+    .catch(err=>console.log(err));
+};
+
+exports.postNewPassword=(request, response, next)=>{
+    const newPassword = request.body.password;
+    const userId=request.body.userId;
+    const passwordToken= request.body.token;
+    let foundUser;
+    userModel.findOne({
+        resetToken:passwordToken, 
+        _id:userId
+       // resetTokenExperation:{$gt:Date.now()}
+    })
+    .then(user=>{
+        foundUser=user;
+        return crypt.hash(newPassword, 12)
+    })
+    .then(hashPass=>{
+        foundUser.password=hashPass;
+        foundUser.resetToken=undefined;
+        foundUser.resetTokenExperation=undefined;
+        return foundUser.save();
+    })
+    .then(res=>{
+       response.redirect('/login'); 
+    })
+    .catch(err=>console.log(err));
 };

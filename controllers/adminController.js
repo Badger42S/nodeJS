@@ -63,7 +63,9 @@ exports.postProductEdit=(request, response, next)=>{
 
 exports.getProducts=(request, response, next)=>{
     Product
-    .find()
+    .find({
+        userId:request.user._id
+    })
     .then(products=>{
         response.render('admin/products',{
             prods: products,
