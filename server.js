@@ -4,6 +4,7 @@ const mongoose =require('mongoose');
 const session=require('express-session');
 const MongoSession=require('connect-mongodb-session')(session);
 const csrf = require('csurf');
+const flash=require('connect-flash');
 
 const path =require('path');
 const User=require('./models/userModel');
@@ -18,6 +19,8 @@ const sessionStore =new MongoSession({
 });
 //protection token
 const protectToken=csrf();
+
+app.use(flash());
 //set template engine
 app.set('view engine', 'ejs');
 //share place of templates

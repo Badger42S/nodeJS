@@ -112,3 +112,11 @@ text-align: center;
   background-color: #00695c;
   color: white;
 }
+
+.user-message-error{
+    margin: auto;
+    width: 30rem;
+    text-align: center;
+    border: 1px solid red;
+    background-color: salmon;
+}

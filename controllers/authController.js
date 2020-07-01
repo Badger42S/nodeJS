@@ -3,10 +3,16 @@ const crypt =require('bcryptjs');
 const userModel = require("../models/userModel");
 
 exports.getLogin=(request, response, next)=>{
+    let errorMessage=request.flash('error');
+    if(errorMessage.length>0){
+        errorMessage= errorMessage[0];
+    } else {
+        errorMessage=null;
+    }
     response.render('auth/login',{
         pageTitle: 'Login',
         path: '/login',
-        isAuthenticated: false
+        errorMessage: errorMessage
     });
 };
 
@@ -14,7 +20,6 @@ exports.getSignup=(request, response, next)=>{
     response.render('auth/signup',{
         pageTitle: 'Signup',
         path: '/signup',
-        isAuthenticated: false
     });
 };
 
@@ -54,6 +59,7 @@ exports.postLogin=(request, response, next)=>{
     userModel.findOne({email: email})
         .then(user=>{
             if(!user){
+                request.flash('error', 'Invalid email or password.');
                 return response.redirect('/login');
             }
             crypt.compare(password, user.password)
