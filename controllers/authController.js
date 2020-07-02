@@ -32,6 +32,7 @@ exports.postSignup=(request, response, next)=>{
     const confirmPassword = request.body.confirmPassword;
     const errors= validationResult(request);
     if(!errors.isEmpty()){
+        console.log(errors.array());
         return response.status(422)
             .render('auth/signup',{
                 pageTitle: 'Signup',
@@ -39,24 +40,19 @@ exports.postSignup=(request, response, next)=>{
                 errorMessage: errors.array()
             });
     }
-    userModel.findOne({email: email})
-        .then(findedUser=>{
-            if(findedUser){
-                return response.redirect('/signup');
-            }
-            return crypt.hash(password, 12).then(hashedPass=>{
-                const user =new userModel({
-                    email: email,
-                    password: hashedPass,
-                    cart: {itemc:[]}
-                });
-                return user.save();
-            })
-            .then(()=>{
-                response.redirect('/login')
+
+    crypt.hash(password, 12).then(hashedPass=>{
+            const user =new userModel({
+                email: email,
+                password: hashedPass,
+                cart: {itemc:[]}
             });
+            return user.save();
         })
-        .catch(err=>console.log(err));
+        .then(()=>{
+            response.redirect('/login')
+        });
+
 };
 
 exports.postLogout=(request, response, next)=>{

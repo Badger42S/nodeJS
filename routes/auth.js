@@ -2,6 +2,7 @@ const express = require('express');
 const {check, body}=require('express-validator/check');
 
 const authController=require('../controllers/authController');
+const userModel = require('../models/userModel');
 
 const router = express.Router();
 
@@ -14,7 +15,16 @@ router.get('/password-reset', authController.getResetPassword);
 router.get('/reset/:token', authController.getNewPassword);
 
 router.post('/signup', [
-    check('email', 'Wrong value. Change it!').isEmail(),
+    check('email', 'Wrong value. Change it!')
+        .isEmail()
+        .custom(value=>{
+            return userModel.findOne({email: value})
+                .then(findedUser=>{
+                    if(findedUser){
+                        return Promise.reject('We have this one allrady');
+                    }
+                })
+        }),
     body('password', 'Too short/long password or not a number')
         .isLength({min:2, max:4})
         .isAlphanumeric(),
@@ -22,6 +32,7 @@ router.post('/signup', [
         if(value !== req.body.password){
             throw new Error('Password and confirm password are different')
         }
+        return true;
     })
     ], authController.postSignup);
 
