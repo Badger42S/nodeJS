@@ -1,7 +1,8 @@
 const crypt =require('bcryptjs');
 const crypto=require('crypto');
+const { validationResult } = require('express-validator/check');
+
 const userModel = require("../models/userModel");
-const { mongo } = require('mongoose');
 
 exports.getLogin=(request, response, next)=>{
     let errorMessage=request.flash('error');
@@ -21,6 +22,7 @@ exports.getSignup=(request, response, next)=>{
     response.render('auth/signup',{
         pageTitle: 'Signup',
         path: '/signup',
+        errorMessage: null
     });
 };
 
@@ -28,6 +30,15 @@ exports.postSignup=(request, response, next)=>{
     const email = request.body.email;
     const password = request.body.password;
     const confirmPassword = request.body.confirmPassword;
+    const errors= validationResult(request);
+    if(!errors.isEmpty()){
+        return response.status(422)
+            .render('auth/signup',{
+                pageTitle: 'Signup',
+                path: '/signup',
+                errorMessage: errors.array()
+            });
+    }
     userModel.findOne({email: email})
         .then(findedUser=>{
             if(findedUser){

@@ -115,6 +115,8 @@ text-align: center;
 
 .user-message-error{
     margin: auto;
+    margin-top: 5px;
+    padding: 5px;
     width: 30rem;
     text-align: center;
     border: 1px solid red;
