@@ -22,7 +22,12 @@ exports.getSignup=(request, response, next)=>{
     response.render('auth/signup',{
         pageTitle: 'Signup',
         path: '/signup',
-        errorMessage: null
+        errorMessage: null,
+        oldInput: {
+            email:'',
+            password:'', 
+            confirmPassword:''
+        }
     });
 };
 
@@ -32,12 +37,16 @@ exports.postSignup=(request, response, next)=>{
     const confirmPassword = request.body.confirmPassword;
     const errors= validationResult(request);
     if(!errors.isEmpty()){
-        console.log(errors.array());
         return response.status(422)
             .render('auth/signup',{
                 pageTitle: 'Signup',
                 path: '/signup',
-                errorMessage: errors.array()
+                errorMessage: errors.array(),
+                oldInput: {
+                    email:email,
+                    password:password, 
+                    confirmPassword:confirmPassword
+                }
             });
     }
 
