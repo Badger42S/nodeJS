@@ -31,6 +31,7 @@ const shopRoute=require('./routes/shop');
 const authRoute=require('./routes/auth');
 
 const errorController=require('./controllers/error');
+const { error } = require('console');
 
 //useing middlewware
 app.use(bodyParser.urlencoded({extended:false}));
@@ -55,7 +56,11 @@ app.use((req,res,next)=>{
             req.user=user;
             next();
         })
-        .catch(err=>console.log(err));
+        .catch(err=>{
+            const error =new Error(err);
+            error.httpStatusCode=500;
+            return next(error);  //important use next in async code
+        });
 })
 
 app.use((req,res,next)=>{
@@ -67,7 +72,11 @@ app.use((req,res,next)=>{
 app.use('/admin',adminRouter);
 app.use(shopRoute);
 app.use(authRoute);
+
 app.use(errorController.get404);
+app.use((error, req, resp, next)=>{
+    res.redirect('/500');
+});
 
 mongoose
     .connect(MONGO_URI)
