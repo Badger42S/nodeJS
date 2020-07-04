@@ -75,7 +75,7 @@ app.use(authRoute);
 
 app.use(errorController.get404);
 app.use((error, req, resp, next)=>{
-    res.redirect('/500');
+    resp.redirect('/500');
 });
 
 mongoose

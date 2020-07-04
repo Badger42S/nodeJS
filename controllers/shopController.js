@@ -1,16 +1,33 @@
 const Product=require('../models/productModel');
 const Orders=require('../models/orderModel');
 
+const ITEMS_PER_PAGE=2;
+
 exports.getProducts =(request, response, next)=>{
-    Product
-    .find()
-    .then(products=>{
-        response.render('shop/product-list',{
-            prods: products,
-            pageTitle: 'All products',
-            path: '/products',
-        });
-    })
+    const paramPage=request.query.page;
+    const page = paramPage? +paramPage :1;
+    let totalItems;
+
+    Product.countDocuments()
+        .then(productQty=>{
+            totalItems=productQty;
+            return Product.find()
+                .skip((page-1)*ITEMS_PER_PAGE)
+                .limit(ITEMS_PER_PAGE)
+        })
+        .then(products=>{
+            response.render('shop/product-list',{
+                prods: products,
+                pageTitle: 'All products',
+                path: '/products',
+                currentPage: page,
+                hasNextPage: ITEMS_PER_PAGE*page<totalItems,
+                hasPreviousPage:page>1,
+                nextPage: page+1,
+                prevPage: page-1,
+                lastPage: Math.ceil(totalItems/ITEMS_PER_PAGE)
+            });
+        })
     .catch(err=>console.log(err));
 };
 
@@ -28,16 +45,31 @@ exports.getProduct =(request, response, next)=>{
 };
 
 exports.getIndex=(request, response, next)=>{
-    Product
-    .find()
-    .then(products=>{
-        response.render('shop/index',{
-            prods: products,
-            pageTitle: 'Shop',
-            path: '/',
-        });
-    })
-    .catch(err=>console.log(err));
+    const paramPage=request.query.page;
+    const page = paramPage? +paramPage :1;
+    let totalItems;
+
+    Product.countDocuments()
+        .then(productQty=>{
+            totalItems=productQty;
+            return Product.find()
+                .skip((page-1)*ITEMS_PER_PAGE)
+                .limit(ITEMS_PER_PAGE)
+        })
+        .then(products=>{
+            response.render('shop/index',{
+                prods: products,
+                pageTitle: 'Shop',
+                path: '/',
+                currentPage: page,
+                hasNextPage: ITEMS_PER_PAGE*page<totalItems,
+                hasPreviousPage:page>1,
+                nextPage: page+1,
+                prevPage: page-1,
+                lastPage: Math.ceil(totalItems/ITEMS_PER_PAGE)
+            });
+        })
+        .catch(err=>console.log(err));
 };
 
 exports.getCart=(request, response, next)=>{
