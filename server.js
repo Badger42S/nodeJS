@@ -31,7 +31,6 @@ const shopRoute=require('./routes/shop');
 const authRoute=require('./routes/auth');
 
 const errorController=require('./controllers/error');
-const { error } = require('console');
 
 //useing middlewware
 app.use(bodyParser.urlencoded({extended:false}));

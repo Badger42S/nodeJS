@@ -82,3 +82,14 @@ exports.postProductDelete=(request, response, next)=>{
         .then(()=>response.redirect('/admin/products'))
         .catch(err=>console.log(err));
 };
+
+exports.deleteProduct=(request, response, next)=>{
+    const prodId=request.params.productId; 
+    Product.findByIdAndRemove(prodId)
+        .then(()=>{
+            response.status(200).json({message: 'Done'});
+        })
+        .catch(err=>{
+            response.status(500).json({message: 'Failed'});
+        });
+};
