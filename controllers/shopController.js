@@ -111,11 +111,23 @@ exports.getOrder=(request, response, next)=>{
 };
 
 exports.getCheckout=(request, response, next)=>{
-    response.render('shop/checkout',{
-        prods: products,
-        pageTitle: 'Checkout',
-        path: '/checkout',
+    request.user
+    .populate('cart.items.productId')
+    .execPopulate()
+    .then(user=>{
+        const products=user.cart.items;
+        let total=0;
+        total=products.reduce((sum,prod)=>{
+            return sum+prod;
+        },0);
+        response.render('shop/checkout',{
+            prods: products,
+            pageTitle: 'Checkout',
+            path: '/checkout',
+            totalSum:total
+        })
     })
+    .catch(err=>console.log(err))
 };
 
 exports.postCartDeleteProd=(request, response, next)=>{
