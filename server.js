@@ -29,13 +29,24 @@ app.set('views', 'views');
 const adminRouter=require('./routes/admin');
 const shopRoute=require('./routes/shop');
 const authRoute=require('./routes/auth');
+const restRoute=require('./routes/rest');
 
 const errorController=require('./controllers/error');
 
 //useing middlewware
 app.use(bodyParser.urlencoded({extended:false}));
+app.use('/rest',bodyParser.json());
 //static files
 app.use(express.static(path.join(__dirname,'public')));
+//headers for rest request
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
+app.use('/rest',restRoute);
+
 //session
 app.use(session({
     secret:'fnl;sfpijq',
